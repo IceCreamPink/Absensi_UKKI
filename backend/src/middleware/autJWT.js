@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
-const scretkey = require("a i u e o");
+const secretkey = "semesterancuyy";
 
-const authJWT = (req, res, next) => {
+const authJwt = (req, res, next) => {
   const token = req.header("Authorization");
   if (token) {
     const auth = token.split(" ")[1];
-    jwt.verify(auth, scretkey, (err, admin) => {
+    jwt.verify(auth, secretkey, (err, user) => {
       if (err) {
         return res.sendStatus(403);
       }
@@ -16,4 +16,5 @@ const authJWT = (req, res, next) => {
     res.sendStatus(401);
   }
 };
-module.exports = authJWT;
+
+module.exports = authJwt;

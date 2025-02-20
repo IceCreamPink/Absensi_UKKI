@@ -1,4 +1,4 @@
-const koneksi = require("./server");
+const koneksi = require("../config/server");
 
 const getAll = (callback) => {
   const q = `select * from kelas`;

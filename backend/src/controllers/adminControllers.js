@@ -1,7 +1,21 @@
 const admin = require("../models/admin");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const index = (req, res) => {
   admin.getAll((err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Admin Kosong" });
+    }
+    res.status(200).json(result);
+  });
+};
+const getId = (req, res) => {
+  const { id } = req.params;
+  admin.getId(id, (err, result) => {
     if (err) {
       return res.status(505).json({ error: err.message });
     }
@@ -44,9 +58,42 @@ const destroy = (req, res) => {
     res.status(200).json({ message: `hapus admin dengan id : ${id} berhasil` });
   });
 };
+const login = (req, res) => {
+  const { username, password } = req.body;
+  console.log(password);
+
+  admin.getUsername(username, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (result === 0) {
+      return res.status(400).json({ message: "username Tidak Ditemukan" });
+    }
+
+    const admin = result[0];
+    const passwordValid = bcrypt.compareSync(password, admin.password);
+
+    if (!passwordValid) {
+      return res.status(401).json({ message: "Password Keliru" });
+    }
+
+    const token = jwt.sign({ id: admin.id }, "semesterancuyy", {
+      expiresIn: 86400,
+    });
+    res.status(200).json({ auth: true, token });
+  });
+};
+
+// Status LogOut
+const logout = (req, res) => {
+  res.status(200).json({ auth: false, token: null });
+};
 module.exports = {
   index,
+  getId,
   store,
   update,
   destroy,
+  login,
+  logout,
 };
